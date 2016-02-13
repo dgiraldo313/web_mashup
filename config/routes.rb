@@ -1,4 +1,15 @@
 Rails.application.routes.draw do
+  namespace :api do
+    namespace :v0 do
+      resources :search_queries
+
+
+    end
+  end
+
+  get "search", to: "api/v0/search_queries#new"
+  get "search/:id", to: "api/v0/search_queries#show"
+  root to: 'home#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
