@@ -34,7 +34,7 @@ gem 'responders', '~> 2.0'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-
+gem 'puma'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
@@ -50,4 +50,8 @@ end
 
 group :test do
   gem 'cucumber'
+end
+
+group :production do
+  gem 'pg'
 end
