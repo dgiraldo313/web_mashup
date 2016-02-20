@@ -35,10 +35,13 @@ gem 'responders', '~> 2.0'
 
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
-
+gem 'puma'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+
+  #RSpec for unit testing
+  gem 'rspec-rails', '~> 3.0'
 end
 
 group :development do
@@ -52,4 +55,8 @@ end
 
 group :test do
   gem 'cucumber'
+end
+
+group :production do
+  gem 'pg'
 end
