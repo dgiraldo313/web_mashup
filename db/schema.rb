@@ -11,7 +11,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160213173814) do
+ActiveRecord::Schema.define(version: 20160220215132) do
+
+  create_table "results", force: :cascade do |t|
+    t.string   "resource1",  limit: 255
+    t.string   "resource2",  limit: 255
+    t.string   "resource3",  limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "search_queries", force: :cascade do |t|
     t.string   "title",      limit: 255
@@ -19,6 +27,15 @@ ActiveRecord::Schema.define(version: 20160213173814) do
     t.date     "pub_date"
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string   "first_name",  limit: 255
+    t.string   "last_name",   limit: 255
+    t.string   "institution", limit: 255
+    t.string   "API_key",     limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
 end
