@@ -20,7 +20,12 @@ class Api::V0::SearchQueriesController < ApplicationController
   def create
     @search= SearchQuery.create(search_params)
     # redirect_to api_v0_search_query_path(@search)
-    respond_with :api, :v0, @search
+    if @search.save
+      respond_with :api, :v0, @search
+    else
+      flash[:notice] = "Failed to search content"
+      redirect_to search_path
+    end
   end
 
 
