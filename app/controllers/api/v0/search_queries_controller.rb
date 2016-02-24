@@ -27,8 +27,7 @@ class Api::V0::SearchQueriesController < ApplicationController
       redirect_to search_path
     end
   end
-
-
+  
   # Methods
   private
   # finds a search_query by id

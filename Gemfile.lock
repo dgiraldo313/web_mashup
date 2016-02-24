@@ -222,6 +222,7 @@ DEPENDENCIES
   jquery-rails
   launchy
   mysql2 (~> 0.4.2)
+  nokogiri
   pg
   puma
   rails (= 4.2.5.1)
