@@ -18,16 +18,17 @@ class Api::V0::SearchQueriesController < ApplicationController
   end
   # creates a record of a search_query
   def create
-    @title= params[:title]
-    @author= params[:author]
-    @start_pub_year= params[:start_pub_year]
-    @end_pub_year= params[:end_pub_year]
+    # save parameters from form onto variables
+    @title= getParamValues(:title)
+    @author= getParamValues(:author)
+    @start_pub_year= getParamValues(:start_pub_year)
+    @end_pub_year= getParamValues(:end_pub_year)
+
+    # get the url from DPLA and save to variable
     @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-    puts params[:title]
     @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL))
     # redirect_to api_v0_search_query_path(@search)
     if @search.save
-
       respond_with :api, :v0, @search
     else
       flash[:notice] = "Failed to search content"
@@ -48,6 +49,11 @@ class Api::V0::SearchQueriesController < ApplicationController
     params.require(:search_query).permit(:title, :author, :start_pub_year, :end_pub_year)
   end
 
+  # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
+  def getParamValues(field)
+    return params.require(:search_query).permit(field)[field]
+  end
+
   ##WYATT
   # This is the function that will create the get request to
   # retrieve the url through the DPLA API.
@@ -60,7 +66,8 @@ class Api::V0::SearchQueriesController < ApplicationController
       #http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html this looks like a good resoruce to figure out get requests on ruby
     #request should be made here
     # request should either return the direct url to the content or nil if nothing found
-    url= "This will be a url to the outside content"
+    url= "This will be a url to the outside content/?"+"title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
+
     return url
   end
 
