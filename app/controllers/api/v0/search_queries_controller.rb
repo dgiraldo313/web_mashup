@@ -48,6 +48,23 @@ class Api::V0::SearchQueriesController < ApplicationController
     params.require(:search_query).permit(:title, :author, :start_pub_year, :end_pub_year)
   end
 
+   def search_prep()
+    @new_title = @title.to_s
+    @new_title.gsub(/\s/, '+')
+    while @new_title[-1,1] == '+' do
+       @new_title.chomp('+')
+    end
+    @new_author = @author.to_s
+    @new_author.gsub(/\s/, '+')
+    while @new_author[-1,1] == '+' do
+      @new_author.chomp('+')
+    end
+    api_key_file = open('./DPLA_API_KEY', "rb")
+    @api_key = api_key_file.read()
+    @start_date = "1-1-" + @start_pub_year.to_s
+    @stop_date = "12-31-" + @end_pub_year.to_s
+  end
+
   ##WYATT
   # This is the function that will create the get request to
   # retrieve the url through the DPLA API.
@@ -55,6 +72,10 @@ class Api::V0::SearchQueriesController < ApplicationController
   # We can put together the url by using the parameters passed in to the function( author, title, etc..)
   # this function should return a string with the url to the microfiche or null if nothing found.
   def get_DPLA_url(title, author, start_pub_year, end_pub_year)
+    search_prep()
+    search_url = 'http://api.dp.la/v2/items?'
+    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + 'sourceResource.date.after' + start_date + 'sourceResource.date.before' + stop_date + '&api_key' = @api_key ) 
+    
     #build url to send request to api (Ex. api.dpla.com/?title....)
     # figure out how to make GET request with ruby
       #http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html this looks like a good resoruce to figure out get requests on ruby
