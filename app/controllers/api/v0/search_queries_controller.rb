@@ -18,7 +18,12 @@ class Api::V0::SearchQueriesController < ApplicationController
   end
   # creates a record of a search_query
   def create
-    @DPLA_URL = get_DPLA_url(:author, :title, :start_pub_year, :end_pub_date)
+    @title= params[:title]
+    @author= params[:author]
+    @start_pub_year= params[:start_pub_year]
+    @end_pub_year= params[:end_pub_year]
+    @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+    puts params[:title]
     @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL))
     # redirect_to api_v0_search_query_path(@search)
     if @search.save
@@ -49,12 +54,13 @@ class Api::V0::SearchQueriesController < ApplicationController
   # Basically we need to make a GET request to the API.
   # We can put together the url by using the parameters passed in to the function( author, title, etc..)
   # this function should return a string with the url to the microfiche or null if nothing found.
-  def get_DPLA_url(author, title, start_pub_year, end_pub_date)
+  def get_DPLA_url(title, author, start_pub_year, end_pub_year)
     #build url to send request to api (Ex. api.dpla.com/?title....)
     # figure out how to make GET request with ruby
+      #http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html this looks like a good resoruce to figure out get requests on ruby
     #request should be made here
     # request should either return the direct url to the content or nil if nothing found
-    url= "This will be a url"
+    url= "This will be a url to the outside content"
     return url
   end
 
