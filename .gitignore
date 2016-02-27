@@ -15,3 +15,7 @@
 /log/*
 !/log/.keep
 /tmp
+
+# Ignore API Keys 
+/DPLA_API_KEY
+/app/controllers/api/v0/DPLA_API_KEY

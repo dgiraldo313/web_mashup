@@ -28,6 +28,28 @@ class Api::V0::SearchQueriesController < ApplicationController
     end
   end
   
+  def search_prep()
+    @new_title = :title.to_s
+    @new_title.gsub(/\s/, '+')
+    while @new_title[-1,1] == '+' do
+       @new_title.chomp('+')
+    end
+    @new_author = :author.to_s
+    @new_author.gsub(/\s/, '+')
+    while @new_author[-1,1] == '+' do
+      @new_author.chomp('+')
+    end
+    api_key_file = open('./DPLA_API_KEY', "rb")
+    @api_key = api_key_file.read()
+    puts :pub_date
+  end
+
+  def generate()
+    search_prep()
+    base_url = 'http://api.dp.la/v2/items?'
+    base_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&api_key' = @api_key ) 
+    return base_url
+  end
   # Methods
   private
   # finds a search_query by id
