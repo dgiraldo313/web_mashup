@@ -44,7 +44,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.0'
 
 #RSpec for unit testing
-  gem 'cucumber-rails'
+  gem 'cucumber-rails',  :require => false
   gem 'cucumber-rails-training-wheels' # some pre-fabbed step definitions
   gem 'database_cleaner' # to clear Cucumber's test database between runs
   gem 'capybara'         # lets Cucumber pretend to be a web browser
