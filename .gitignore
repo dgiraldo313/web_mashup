@@ -15,3 +15,5 @@
 /log/*
 !/log/.keep
 /tmp
+
+DPLA_API_KEY

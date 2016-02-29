@@ -53,19 +53,24 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   def search_prep(title, author, start_pub_year, end_pub_year)
     @new_title = title.to_s
-    @new_title.gsub(/\s/, '+')
+    @new_title.gsub(/[\s]/, '+')
     while @new_title[-1,1] == '+' do
        @new_title.chomp('+')
     end
     @new_author = author.to_s
-    @new_author.gsub(/\s/, '+')
+    @new_author.gsub(/[\s]/, '+')
     while @new_author[-1,1] == '+' do
       @new_author.chomp('+')
     end
     api_key_file = open('./DPLA_API_KEY', "rb")
-    @api_key = api_key_file.read()
+    begin
+      @api_key = api_key_file.read()
+    rescue
+      puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
+      @api_key=nil
+    end
     @start_date = "1-1-" + start_pub_year.to_s
-    @stop_date = "12-31-" + end_pub_year.to_s
+    @stop_date = "31-12-" + end_pub_year.to_s
   end
 
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
@@ -82,19 +87,22 @@ class Api::V0::SearchQueriesController < ApplicationController
   def get_DPLA_url(title, author, start_pub_year, end_pub_year)
     search_prep(title, author, start_pub_year, end_pub_year)
     search_url = 'http://api.dp.la/v2/items?'
-    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + 'sourceResource.date.after' + start_date + 'sourceResource.date.before' + stop_date + '&fields=isShownAt,' + '&api_key' + @api_key ) 
+    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + 'sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&fields=isShownAt' + '&api_key=' + @api_key ) 
     json_data = Net::HTTP.get_response(URI.parse(search_url)).body
-    file = File.read(json_data)
-    data_hash = JSON.parse(file)
-    url = data_hash['docs'][0]["isShownAt"]
+    data_hash = JSON.parse(json_data)
+    begin
+      url = data_hash['docs'][0]["isShownAt"]
+    rescue 
+      url = "External resoruce not found."
+    end
+
     #build url to send request to api (Ex. api.dpla.com/?title....)
     # figure out how to make GET request with ruby
       #http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html this looks like a good resoruce to figure out get requests on ruby
     #request should be made here
     # request should either return the direct url to the content or nil if nothing found
-    url+="title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
+    #url+="title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
 
     return url
   end
-
 end

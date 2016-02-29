@@ -35,7 +35,7 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
         @api_key.should_not eq(nil)
       end
 
-      it 'should retrieve an xml doc' do
+      it 'should retrieve an JSON doc' do
         @doc.should_not eq(nil)
       end
 
