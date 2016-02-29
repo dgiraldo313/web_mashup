@@ -53,12 +53,12 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   def search_prep(title, author, start_pub_year, end_pub_year)
     @new_title = title.to_s
-    @new_title.gsub(/[\s]/, '+')
+    @new_title = @new_title.gsub(/[\s]/, '+')
     while @new_title[-1,1] == '+' do
        @new_title.chomp('+')
     end
     @new_author = author.to_s
-    @new_author.gsub(/[\s]/, '+')
+    @new_author = @new_author.gsub(/[\s]/, '+')
     while @new_author[-1,1] == '+' do
       @new_author.chomp('+')
     end
@@ -93,7 +93,7 @@ class Api::V0::SearchQueriesController < ApplicationController
     begin
       url = data_hash['docs'][0]["isShownAt"]
     rescue 
-      url = "External resoruce not found."
+      url = nil
     end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)

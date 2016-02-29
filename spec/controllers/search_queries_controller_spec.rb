@@ -28,20 +28,15 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
       end
 
       it 'should remove whitespace' do
-        /^[^\s]+$/.match(@words).should_not eq(nil)
+        /^[^\s]+$/.match(@new_title).should_not eq(nil)
       end
 
       it 'should get the API key from a file' do
         @api_key.should_not eq(nil)
       end
 
-      it 'should retrieve an JSON doc' do
-        @doc.should_not eq(nil)
-      end
-
-      it 'should parse the xml doc and return a name and url' do
-        @results = @search.parse(@doc)
-        @results.should_not eq(nil)
+      it 'should parse the JSON doc and return a url' do
+        @DPLA_URL.should_not eq(nil)
       end
     end
   end
