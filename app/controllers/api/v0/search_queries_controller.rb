@@ -69,8 +69,8 @@ class Api::V0::SearchQueriesController < ApplicationController
       puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
       @api_key=nil
     end
-    @start_date = "1-1-" + start_pub_year.to_s
-    @stop_date = "31-12-" + end_pub_year.to_s
+    @start_date = start_pub_year.to_s
+    @stop_date = end_pub_year.to_s 
   end
 
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
@@ -86,14 +86,19 @@ class Api::V0::SearchQueriesController < ApplicationController
   # this function should return a string with the url to the microfiche or null if nothing found.
   def get_DPLA_url(title, author, start_pub_year, end_pub_year)
     search_prep(title, author, start_pub_year, end_pub_year)
-    search_url = 'http://api.dp.la/v2/items?'
-    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + 'sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&fields=isShownAt' + '&api_key=' + @api_key ) 
-    json_data = Net::HTTP.get_response(URI.parse(search_url)).body
-    data_hash = JSON.parse(json_data)
+    base_url = 'api.dp.la'
+    search_url = '/v2/items?'
+    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date  + '&api_key=' + @api_key ) 
+    response = Net::HTTP.get_response(base_url,search_url)
+    response_body = response.body
+    data_hash = JSON.parse(response_body)
+    #json_data = Net::HTTP.get(URI.parse(search_url))
+    #file = file.read(json_data)
+    #data_hash = JSON.parse(json_data)
     begin
-      url = data_hash['docs'][0]["isShownAt"]
+      url = data_hash["docs"][0]["isShownAt"]
     rescue 
-      url = nil
+     url = nil
     end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)

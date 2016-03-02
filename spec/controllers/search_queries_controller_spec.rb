@@ -24,11 +24,15 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
       before :all do
         @search = Api::V0::SearchQueriesController.new
         @search.create
-        @api_key = open('DPLA_API_KEY')
+        @search.title = "new title"
+        @search.author = 'new author'
+        @search.start_pub_year = 1500
+        @search.end_pub_year = 2015
       end
 
       it 'should remove whitespace' do
-        /^[^\s]+$/.match(@new_title).should_not eq(nil)
+        /^[^\s]+$/.match(@search.new_title).should_not eq(nil)
+        /^[^\s]+$/.match(@search.new_author).should_not eq(nil)
       end
 
       it 'should get the API key from a file' do
