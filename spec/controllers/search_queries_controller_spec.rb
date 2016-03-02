@@ -20,6 +20,28 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
           expect @search.save raise_error(ActiveRecord::RecordInvalid,"Validation failed: Author can't be blank, Pub date can't be blank")
       end
     end
+    describe "perform_search" do
+      before :all do
+        @search = Api::V0::SearchQueriesController.new
+        @search.create
+        @search.title = "new title"
+        @search.author = 'new author'
+        @search.start_pub_year = 1500
+        @search.end_pub_year = 2015
+      end
 
+      it 'should remove whitespace' do
+        /^[^\s]+$/.match(@search.new_title).should_not eq(nil)
+        /^[^\s]+$/.match(@search.new_author).should_not eq(nil)
+      end
+
+      it 'should get the API key from a file' do
+        @api_key.should_not eq(nil)
+      end
+
+      it 'should parse the JSON doc and return a url' do
+        @DPLA_URL.should_not eq(nil)
+      end
+    end
   end
 end
