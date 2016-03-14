@@ -220,6 +220,7 @@ DEPENDENCIES
   database_cleaner
   jbuilder (~> 2.0)
   jquery-rails
+  json
   launchy
   mysql2 (~> 0.4.2)
   nokogiri
