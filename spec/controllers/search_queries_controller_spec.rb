@@ -65,9 +65,12 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
 			@doc.should_not eq(nil)
 		end
 
-		it 'should parse the xml doc and return a name and url' do
+		it 'should parse the xml doc and return a hash' do
 			@results = @search.parse(@doc)
-			@results.should_not eq(nil)
+			@results.kind_of?(Hash).should eq(true)
 		end
+
+    it 'should retrieve metadata for an entry' do
+      @results.should eq 
 	end
 end
