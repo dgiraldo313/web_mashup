@@ -37,8 +37,29 @@ class Api::V0::SearchQueriesController < ApplicationController
       redirect_to search_path
     end
   end
+  
+  def search_prep()
+    @new_title = :title.to_s
+    @new_title.gsub(/\s/, '+')
+    while @new_title[-1,1] == '+' do
+       @new_title.chomp('+')
+    end
+    @new_author = :author.to_s
+    @new_author.gsub(/\s/, '+')
+    while @new_author[-1,1] == '+' do
+      @new_author.chomp('+')
+    end
+    api_key_file = open('./DPLA_API_KEY', "rb")
+    @api_key = api_key_file.read()
+    puts :pub_date
+  end
 
-
+  def generate()
+    search_prep()
+    base_url = 'http://api.dp.la/v2/items?'
+    base_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&api_key=' + @api_key ) 
+    return base_url
+  end
   # Methods
   private
   # finds a search_query by id
@@ -88,7 +109,7 @@ class Api::V0::SearchQueriesController < ApplicationController
     search_prep(title, author, start_pub_year, end_pub_year)
     base_url = 'api.dp.la'
     search_url = '/v2/items?'
-    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date  + '&api_key=' + @api_key ) 
+    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key ) 
     response = Net::HTTP.get_response(base_url,search_url)
     response_body = response.body
     data_hash = JSON.parse(response_body)
