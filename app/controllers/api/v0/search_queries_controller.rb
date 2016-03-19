@@ -1,4 +1,5 @@
 require "net/http"
+require "uri"
 
 class Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
@@ -107,10 +108,12 @@ class Api::V0::SearchQueriesController < ApplicationController
   # this function should return a string with the url to the microfiche or null if nothing found.
   def get_DPLA_url(title, author, start_pub_year, end_pub_year)
     search_prep(title, author, start_pub_year, end_pub_year)
-    base_url = 'api.dp.la'
+    base_url = 'http://api.dp.la'
     search_url = '/v2/items?'
     search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key ) 
-    response = Net::HTTP.get_response(base_url,search_url)
+    final_url = base_url + search_url
+    final_url_uri = URI.parse(final_url)
+    response = Net::HTTP.get_response(final_url_uri)
     response_body = response.body
     data_hash = JSON.parse(response_body)
     #json_data = Net::HTTP.get(URI.parse(search_url))
