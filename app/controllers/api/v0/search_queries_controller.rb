@@ -119,10 +119,21 @@ class Api::V0::SearchQueriesController < ApplicationController
     #json_data = Net::HTTP.get(URI.parse(search_url))
     #file = file.read(json_data)
     #data_hash = JSON.parse(json_data)
-    begin
-      url = data_hash["docs"][0]["isShownAt"]
-    rescue 
-     url = nil
+    count = data_hash["count"]
+    if count> 10
+      count = 10
+    end
+    if count > 0
+      for i in 0..(count-1)
+        begin
+          title = data_hash["docs"][i]["sourceResource"]["title"]
+          creator = data_hash["docs"][i]["sourceResource"]["creator"]
+          pub_date = data_hash["docs"][i]["sourceResource"]["date"]["end"]
+          url = data_hash["docs"][i]["isShownAt"]
+        rescue 
+          url = nil
+        end
+      end
     end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)
