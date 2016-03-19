@@ -27,6 +27,8 @@ gem 'bootstrap-sass'
 gem 'simplecov', :require => false, :group => :test
 
 gem 'responders', '~> 2.0'
+
+gem 'json'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
