@@ -1,9 +1,11 @@
 require "net/http"
 require "uri"
+require "json"
 
 class Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
   respond_to :xml, :html, :json
+
 
   # method that collects all search queries in records
   def index
@@ -12,8 +14,9 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   # method that displays a particular instance of a search
   def show
-    @search= search_query
-    respond_with @search
+    #responds with all the results of a particular search
+    @results= search_query.results
+    respond_with @results
   end
 
   def new
@@ -24,12 +27,16 @@ class Api::V0::SearchQueriesController < ApplicationController
     # save parameters from form onto variables
     @title= getParamValues(:title)
     @author= getParamValues(:author)
-    @start_pub_year= getParamValues(:start_pub_year)
-    @end_pub_year= getParamValues(:end_pub_year)
+    @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
+    @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
 
+    # start empty JSON variable
+    @result_hash= {}
     # get the url from DPLA and save to variable
-    @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-    @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL))
+    get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+
+    @results = JSON.generate(@result_hash)
+    @search= SearchQuery.create(search_params.merge(:results => @results))
     # redirect_to api_v0_search_query_path(@search)
     if @search.save
       respond_with :api, :v0, @search
@@ -38,7 +45,7 @@ class Api::V0::SearchQueriesController < ApplicationController
       redirect_to search_path
     end
   end
-  
+
   def search_prep()
     @new_title = :title.to_s
     @new_title.gsub(/\s/, '+')
@@ -58,7 +65,7 @@ class Api::V0::SearchQueriesController < ApplicationController
   def generate()
     search_prep()
     base_url = 'http://api.dp.la/v2/items?'
-    base_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&api_key=' + @api_key ) 
+    base_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&api_key=' + @api_key )
     return base_url
   end
   # Methods
@@ -70,7 +77,7 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   # defines the require parameters needed to create a search query
   def search_params
-    params.require(:search_query).permit(:title, :author, :start_pub_year, :end_pub_year)
+    params.require(:search_query).permit(:title, :author, :pub_year)
   end
 
   def search_prep(title, author, start_pub_year, end_pub_year)
@@ -92,7 +99,7 @@ class Api::V0::SearchQueriesController < ApplicationController
       @api_key=nil
     end
     @start_date = start_pub_year.to_s
-    @stop_date = end_pub_year.to_s 
+    @stop_date = end_pub_year.to_s
   end
 
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
@@ -110,7 +117,7 @@ class Api::V0::SearchQueriesController < ApplicationController
     search_prep(title, author, start_pub_year, end_pub_year)
     base_url = 'http://api.dp.la'
     search_url = '/v2/items?'
-    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key ) 
+    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key )
     final_url = base_url + search_url
     final_url_uri = URI.parse(final_url)
     response = Net::HTTP.get_response(final_url_uri)
@@ -119,10 +126,26 @@ class Api::V0::SearchQueriesController < ApplicationController
     #json_data = Net::HTTP.get(URI.parse(search_url))
     #file = file.read(json_data)
     #data_hash = JSON.parse(json_data)
-    begin
-      url = data_hash["docs"][0]["isShownAt"]
-    rescue 
-     url = nil
+
+    #add DPLA content to hash
+    dpla_hash= @result_hash[:DPLA]= {}
+
+    count = data_hash["count"]
+    if count> 10
+      count = 10
+    end
+    if count > 0
+      for i in 0..(count-1)
+        begin
+          title = data_hash["docs"][i]["sourceResource"]["title"]
+          creator = data_hash["docs"][i]["sourceResource"]["creator"]
+          pub_date = data_hash["docs"][i]["sourceResource"]["date"]["end"]
+          url = data_hash["docs"][i]["isShownAt"]
+          dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :url => url}
+        rescue
+          url = nil
+        end
+      end
     end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)
