@@ -33,10 +33,10 @@ class Api::V0::SearchQueriesController < ApplicationController
     # start empty JSON variable
     @result_hash= {}
     # get the url from DPLA and save to variable
-    @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+    get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
 
     @results = JSON.generate(@result_hash)
-    @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL, :results => @results))
+    @search= SearchQuery.create(search_params.merge(:results => @results))
     # redirect_to api_v0_search_query_path(@search)
     if @search.save
       respond_with :api, :v0, @search
@@ -130,12 +130,22 @@ class Api::V0::SearchQueriesController < ApplicationController
     #add DPLA content to hash
     dpla_hash= @result_hash[:DPLA]= {}
 
-    begin
-
-      url = data_hash["docs"][0]["isShownAt"]
-      dpla_hash[:result]= url
-    rescue
-     url = nil
+    count = data_hash["count"]
+    if count> 10
+      count = 10
+    end
+    if count > 0
+      for i in 0..(count-1)
+        begin
+          title = data_hash["docs"][i]["sourceResource"]["title"]
+          creator = data_hash["docs"][i]["sourceResource"]["creator"]
+          pub_date = data_hash["docs"][i]["sourceResource"]["date"]["end"]
+          url = data_hash["docs"][i]["isShownAt"]
+          dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :url => url}
+        rescue
+          url = nil
+        end
+      end
     end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)
