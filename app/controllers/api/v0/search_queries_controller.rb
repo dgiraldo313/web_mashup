@@ -91,9 +91,10 @@ class Api::V0::SearchQueriesController < ApplicationController
     while @new_author[-1,1] == '+' do
       @new_author.chomp('+')
     end
-    api_key_file = open('./DPLA_API_KEY', "rb")
+    # api_key_file = open('./DPLA_API_KEY', "rb")
     begin
-      @api_key = api_key_file.read()
+      # @api_key = api_key_file.read()
+      @api_key = ENV['DPLA_API_KEY']
     rescue
       puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
       @api_key=nil
