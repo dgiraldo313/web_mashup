@@ -15,6 +15,19 @@ Feature: Viewer visits the home page and search
     And I should see "API DOCS and two buttons (Signup and Search)"
     Then I should see "Search"
 
+  Scenario: Signup and Search
+    Given I am on the Search page
+    When I see "Signup"
+    And I see "Search"
+    Then I should input "Personal details"
+
+  Scenario: Sign Up
+    Given I am on the Signup page
+    When I see  Signup link
+    And I should click
+    Then I should see input information page
+    And I should type personal information
+
   Scenario: Find the link to the search page
     Given I am on the Search page
     When I see "Title"

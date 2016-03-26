@@ -7,7 +7,32 @@ Then(/^I should see "([^"]*)"$/) do |text|
 end
 
 Then(/^I should see  "([^"]*)"$/) do |path|
-  page.should have_button button, content: path
+  page.should have_button, content: path
+end
+
+Then(/^I should input "([^"]*)"$/) do |text|
+  #@message = @ personal_details.text
+end
+
+Given(/^I am on the Signup page$/) do
+  #@messages = @Signup.link
+  #should_not_continue = true if  Signup_link.failed
+end
+
+When(/^I see  Signup link$/) do |message|
+  #@message.should inlcude(message)
+end
+
+When(/^I should click$/) do |message|
+  #pending # Write code here that turns the phrase above into concrete actions
+end
+
+Then(/^I should see input information page$/) do
+  #pending # Write code here that turns the phrase above into concrete actions
+end
+
+Then(/^I should type personal information$/) do
+  #pending # Write code here that turns the phrase above into concrete actions
 end
 
 Given(/^I am on the Search page$/) do
