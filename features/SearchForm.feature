@@ -28,3 +28,9 @@ Feature: Viewer visits the home page and search
     And I type "Barry Burd"
     And I type "2001"
     Then I should see "Failed to search content"
+
+  Scenario: Page Hathi Trust should appear with search results
+    Given I am on the Hathi Trust result page
+    When I see "multiple results"
+    And I see relevant search results
+    Then I should see numbers of results displayed

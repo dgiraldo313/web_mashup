@@ -1,8 +1,11 @@
 require "net/http"
+require "uri"
+require "json"
 
 class Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
   respond_to :xml, :html, :json
+
 
   # method that collects all search queries in records
   def index
@@ -11,8 +14,9 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   # method that displays a particular instance of a search
   def show
-    @search= search_query
-    respond_with @search
+    #responds with all the results of a particular search
+    @results= search_query.results
+    respond_with @results
   end
 
   def new
@@ -23,12 +27,16 @@ class Api::V0::SearchQueriesController < ApplicationController
     # save parameters from form onto variables
     @title= getParamValues(:title)
     @author= getParamValues(:author)
-    @start_pub_year= getParamValues(:start_pub_year)
-    @end_pub_year= getParamValues(:end_pub_year)
+    @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
+    @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
 
+    # start empty JSON variable
+    @result_hash= {}
     # get the url from DPLA and save to variable
-    @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-    @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL))
+    get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+
+    @results = JSON.generate(@result_hash)
+    @search= SearchQuery.create(search_params.merge(:results => @results))
     # redirect_to api_v0_search_query_path(@search)
     if @search.save
       respond_with :api, :v0, @search
@@ -38,7 +46,28 @@ class Api::V0::SearchQueriesController < ApplicationController
     end
   end
 
+  def search_prep()
+    @new_title = :title.to_s
+    @new_title.gsub(/\s/, '+')
+    while @new_title[-1,1] == '+' do
+       @new_title.chomp('+')
+    end
+    @new_author = :author.to_s
+    @new_author.gsub(/\s/, '+')
+    while @new_author[-1,1] == '+' do
+      @new_author.chomp('+')
+    end
+    api_key_file = open('./DPLA_API_KEY', "rb")
+    @api_key = api_key_file.read()
+    puts :pub_date
+  end
 
+  def generate()
+    search_prep()
+    base_url = 'http://api.dp.la/v2/items?'
+    base_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&api_key=' + @api_key )
+    return base_url
+  end
   # Methods
   private
   # finds a search_query by id
@@ -48,7 +77,7 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   # defines the require parameters needed to create a search query
   def search_params
-    params.require(:search_query).permit(:title, :author, :start_pub_year, :end_pub_year)
+    params.require(:search_query).permit(:title, :author, :pub_year)
   end
 
   def search_prep(title, author, start_pub_year, end_pub_year)
@@ -62,15 +91,16 @@ class Api::V0::SearchQueriesController < ApplicationController
     while @new_author[-1,1] == '+' do
       @new_author.chomp('+')
     end
-    api_key_file = open('./DPLA_API_KEY', "rb")
+    #api_key_file = open('./DPLA_API_KEY', "rb")
     begin
-      @api_key = api_key_file.read()
+      #@api_key = api_key_file.read()
+      @api_key = ENV['DPLA_API_KEY']
     rescue
       puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
       @api_key=nil
     end
     @start_date = start_pub_year.to_s
-    @stop_date = end_pub_year.to_s 
+    @stop_date = end_pub_year.to_s
   end
 
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
@@ -86,19 +116,45 @@ class Api::V0::SearchQueriesController < ApplicationController
   # this function should return a string with the url to the microfiche or null if nothing found.
   def get_DPLA_url(title, author, start_pub_year, end_pub_year)
     search_prep(title, author, start_pub_year, end_pub_year)
-    base_url = 'api.dp.la'
+    base_url = 'http://api.dp.la'
     search_url = '/v2/items?'
-    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date  + '&api_key=' + @api_key ) 
-    response = Net::HTTP.get_response(base_url,search_url)
+    search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key )
+    final_url = base_url + search_url
+    final_url_uri = URI.parse(final_url)
+    response = Net::HTTP.get_response(final_url_uri)
     response_body = response.body
     data_hash = JSON.parse(response_body)
     #json_data = Net::HTTP.get(URI.parse(search_url))
     #file = file.read(json_data)
     #data_hash = JSON.parse(json_data)
-    begin
-      url = data_hash["docs"][0]["isShownAt"]
-    rescue 
-     url = nil
+
+    #add DPLA content to hash
+    count = data_hash["count"]
+    dpla_hash= @result_hash[:DPLA]= {:count=>count}
+    if count> 10
+      count = 10
+    end
+    if count > 0
+      for i in 0..(count-1)
+        begin
+          title = data_hash["docs"][i]["sourceResource"]["title"]
+          creator = data_hash["docs"][i]["sourceResource"]["creator"]
+          pub_date = data_hash["docs"][i]["sourceResource"]["date"]["end"]
+          provider = data_hash["docs"][i]["provider"]["name"]
+          publisher = data_hash["docs"][i]["sourceResource"]["publisher"]
+          url = data_hash["docs"][i]["isShownAt"]
+          begin
+            city = data_hash["docs"][i]["sourceResource"]["spatial"]["city"]
+            country = data_hash["docs"][i]["sourceResource"]["spatial"]["country"]
+            location = city + ", " + country
+            dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :provider=> provider, :publisher=> publisher, :location=> location, :url => url}
+          rescue Exception => e
+            dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :provider=> provider, :publisher=> publisher, :url => url}
+          end
+        rescue
+          url = nil
+        end
+      end
     end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)
