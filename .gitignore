@@ -23,3 +23,6 @@
 app/controllers/api/v0/DPLA_API_KEY
 
 DPLA_API_KEY
+
+# Ignore application configuration
+/config/application.yml
