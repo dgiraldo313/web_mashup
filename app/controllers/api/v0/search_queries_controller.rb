@@ -91,10 +91,10 @@ class Api::V0::SearchQueriesController < ApplicationController
     while @new_author[-1,1] == '+' do
       @new_author.chomp('+')
     end
-    # api_key_file = open('./DPLA_API_KEY', "rb")
+    api_key_file = open('./DPLA_API_KEY', "rb")
     begin
-      # @api_key = api_key_file.read()
-      @api_key = ENV['DPLA_API_KEY']
+      @api_key = api_key_file.read()
+      # @api_key = ENV['DPLA_API_KEY']
     rescue
       puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
       @api_key=nil
@@ -129,9 +129,8 @@ class Api::V0::SearchQueriesController < ApplicationController
     #data_hash = JSON.parse(json_data)
 
     #add DPLA content to hash
-    dpla_hash= @result_hash[:DPLA]= {}
-
     count = data_hash["count"]
+    dpla_hash= @result_hash[:DPLA]= {:count=>count}
     if count> 10
       count = 10
     end
@@ -141,8 +140,17 @@ class Api::V0::SearchQueriesController < ApplicationController
           title = data_hash["docs"][i]["sourceResource"]["title"]
           creator = data_hash["docs"][i]["sourceResource"]["creator"]
           pub_date = data_hash["docs"][i]["sourceResource"]["date"]["end"]
+          provider = data_hash["docs"][i]["provider"]["name"]
+          publisher = data_hash["docs"][i]["sourceResource"]["publisher"]
           url = data_hash["docs"][i]["isShownAt"]
-          dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :url => url}
+          city = data_hash["docs"][i]["sourceResource"]["spatial"]["city"]
+          country = data_hash["docs"][i]["sourceResource"]["spatial"]["country"]
+          begin
+            location = city + ", " + country
+            dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :provider=> provider, :publisher=> publisher, :location=> location, :url => url}
+          rescue Exception => e
+            dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :provider=> provider, :publisher=> publisher, :url => url}
+          end
         rescue
           url = nil
         end
