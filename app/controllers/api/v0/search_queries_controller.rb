@@ -143,9 +143,9 @@ class Api::V0::SearchQueriesController < ApplicationController
           provider = data_hash["docs"][i]["provider"]["name"]
           publisher = data_hash["docs"][i]["sourceResource"]["publisher"]
           url = data_hash["docs"][i]["isShownAt"]
-          city = data_hash["docs"][i]["sourceResource"]["spatial"]["city"]
-          country = data_hash["docs"][i]["sourceResource"]["spatial"]["country"]
           begin
+            city = data_hash["docs"][i]["sourceResource"]["spatial"]["city"]
+            country = data_hash["docs"][i]["sourceResource"]["spatial"]["country"]
             location = city + ", " + country
             dpla_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :provider=> provider, :publisher=> publisher, :location=> location, :url => url}
           rescue Exception => e
