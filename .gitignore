@@ -25,9 +25,4 @@ app/controllers/api/v0/DPLA_API_KEY
 DPLA_API_KEY
 
 
-heroku_env.rb
-
-# Ignore application configuration
 /config/application.yml
-
-config/application.yml
