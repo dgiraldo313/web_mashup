@@ -69,7 +69,7 @@ class Api::V0::SearchQueriesController < ApplicationController
     return base_url
   end
   # Methods
-  private
+  # private
   # finds a search_query by id
   def search_query
     SearchQuery.find(params[:id])
@@ -91,9 +91,9 @@ class Api::V0::SearchQueriesController < ApplicationController
     while @new_author[-1,1] == '+' do
       @new_author.chomp('+')
     end
-    #api_key_file = open('./DPLA_API_KEY', "rb")
+    api_key_file = open('./DPLA_API_KEY', "rb")
     begin
-      #@api_key = api_key_file.read()
+      # @api_key = api_key_file.read()
       @api_key = ENV['DPLA_API_KEY']
     rescue
       puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
@@ -139,7 +139,7 @@ class Api::V0::SearchQueriesController < ApplicationController
         begin
           title = data_hash["docs"][i]["sourceResource"]["title"]
           creator = data_hash["docs"][i]["sourceResource"]["creator"]
-          pub_date = data_hash["docs"][i]["sourceResource"]["date"]["end"]
+          pub_date = data_hash["docs"][i]["sourceResource"]["date"]["displayDate"]
           provider = data_hash["docs"][i]["provider"]["name"]
           publisher = data_hash["docs"][i]["sourceResource"]["publisher"]
           url = data_hash["docs"][i]["isShownAt"]

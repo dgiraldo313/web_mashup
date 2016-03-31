@@ -47,8 +47,10 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
   describe "perform_search" do
 		before :all do
 			@search = Api::V0::SearchQueriesController.new
-			@words = @search.search_prep
-			@api_key = open('DPLA_API_KEY')
+      @search.create!(:title => 'New Title',:author => 'New Author',:pub_date => '1500-01-01')
+
+			@words = @search.search_prep()
+			@api_key = ENV['DPLA_API_KEY']
 			@url = @search.generate
 			@doc = Nokogiri::XML(open(@url))
 		end
@@ -72,5 +74,6 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
 
     it 'should retrieve metadata for an entry' do
       @results.should eq 
+    end
 	end
 end
