@@ -24,25 +24,39 @@ class Api::V0::SearchQueriesController < ApplicationController
   end
   # creates a record of a search_query
   def create
-    # save parameters from form onto variables
+
+    # gets fields ready to check if they are empty
     @title= getParamValues(:title)
     @author= getParamValues(:author)
-    @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
-    @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
+    @pub_year= getParamValues(:pub_year)
 
-    # start empty JSON variable
-    @result_hash= {}
-    # get the url from DPLA and save to variable
-    get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-
-    @results = JSON.generate(@result_hash)
-    @search= SearchQuery.create(search_params.merge(:results => @results))
-    # redirect_to api_v0_search_query_path(@search)
-    if @search.save
-      respond_with :api, :v0, @search
-    else
+    # conditional which checks to see that the user
+    # passed in all the fields required
+    if (@title.empty? || @author.empty? || @pub_year.empty?)
       flash[:notice] = "Failed to search content"
       redirect_to search_path
+    else
+      # if all fields are filled in
+      # then we can start the process of building the JSON variable
+
+      @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
+      @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
+
+
+      # start empty JSON variable
+      @result_hash= {}
+      # get the url from DPLA and save to variable
+      get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+
+      @results = JSON.generate(@result_hash)
+      @search= SearchQuery.create(search_params.merge(:results => @results))
+      # redirect_to api_v0_search_query_path(@search)
+      if @search.save
+        respond_with :api, :v0, @search
+      end
+    # else
+    #   flash[:notice] = "Failed to search content"
+    #   redirect_to search_path
     end
   end
 
