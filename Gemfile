@@ -23,10 +23,15 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
+gem 'bootstrap-sass'
 
 gem 'simplecov', :require => false, :group => :test
 
 gem 'responders', '~> 2.0'
+
+gem 'nokogiri'
+
+gem 'json'
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
@@ -36,10 +41,29 @@ gem 'responders', '~> 2.0'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 gem 'puma'
+
+#setting up Enviroment Variables
+gem "figaro"
+
+#allow CORS
+gem 'rack-cors', :require => 'rack/cors'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'
+
+  #RSpec for unit testing
+  gem 'rspec-rails', '~> 3.0'
+
+#RSpec for unit testing
+  gem 'cucumber-rails'
+  gem 'cucumber-rails-training-wheels' # some pre-fabbed step definitions
+  gem 'database_cleaner' # to clear Cucumber's test database between runs
+  gem 'capybara'         # lets Cucumber pretend to be a web browser
+  gem 'launchy'          # a useful debugging aid for user stories
+
 end
+
 
 group :development do
   # Access an IRB console on exception pages or by using <%= console %> in views
@@ -48,7 +72,6 @@ group :development do
   # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
 end
-
 
 group :test do
   gem 'cucumber'

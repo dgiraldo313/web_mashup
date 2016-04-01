@@ -11,14 +11,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160213173814) do
+ActiveRecord::Schema.define(version: 20160319180733) do
 
-  create_table "search_queries", force: :cascade do |t|
-    t.string   "title",      limit: 255
-    t.string   "author",     limit: 255
-    t.date     "pub_date"
+  create_table "results", force: :cascade do |t|
+    t.string   "resource1",  limit: 255
+    t.string   "resource2",  limit: 255
+    t.string   "resource3",  limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "search_queries", force: :cascade do |t|
+    t.string   "title",          limit: 255
+    t.string   "author",         limit: 255
+    t.integer  "start_pub_year", limit: 4,     default: 1500
+    t.integer  "end_pub_year",   limit: 4
+    t.string   "DPLA_URL",       limit: 255
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.text     "results",        limit: 65535
+    t.integer  "pub_year",       limit: 4
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string   "first_name",  limit: 255
+    t.string   "last_name",   limit: 255
+    t.string   "institution", limit: 255
+    t.string   "API_key",     limit: 255
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
 end

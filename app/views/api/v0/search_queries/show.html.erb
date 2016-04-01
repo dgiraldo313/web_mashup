@@ -1,7 +1,4 @@
-Search ID: <%= @search.id%>
+<% @res= JSON.parse(@results) %>
 </br>
-Title: <%= @search.title%>
-</br>
-Author: <%= @search.author%>
-</br>
-Publication Date: <%= @search.pub_date%>
+
+<%= @res["DPLA"] %>

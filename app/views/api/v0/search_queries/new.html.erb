@@ -5,11 +5,11 @@
   </div class="title"></br>
   <div>
     <%= f.text_field :author, placeholder: 'Author' %>
-  </div><br/>
-  <div >
-    <%= f.label :pub_date %>
-    <%= f.date_field(:pub_date, :start_year => 1800) %>
   </div>
+  <br/>
+  <div >
+    <%= f.text_field  :pub_year, placeholder: 'Publication Year' %>
+  </div><br/>
   </br>
   <%= f.submit "Search"%>
 <% end %>
