@@ -7,13 +7,13 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
     # end
 
       it "saves search query successfully" do
-          @search= SearchQuery.create!(:title => "New title of book", :author => "Name of Author", :pub_date => "2016-02-20")
+          @search= SearchQuery.create!(:title => "New title of book", :author => "Name of Author", :pub_year => "2016")
           expect(response.status).to eq(200)
       end
 
-      # describe "it tries to create a new search query with one field filled in" do
-      #    @search= SearchQuery.create!(:title => "New title of book")
-      # end
+      describe "it tries to create a new search query with one field filled in" do
+         @search= SearchQuery.create!(:title => "New title of book")
+      end
 
       it "fails to save with title field" do
           @search= SearchQuery.create!(:title => "New title of book")
@@ -23,11 +23,11 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
     describe "perform_search" do
       before :all do
         @search = Api::V0::SearchQueriesController.new
-        @search.create
-        @search.title = "new title"
-        @search.author = 'new author'
-        @search.start_pub_year = 1500
-        @search.end_pub_year = 2015
+        @search.create(:title => "New Title", :author => "New Author", :pub_year =>'2016')
+        # @search.title = "new title"
+        # @search.author = 'new author'
+        # @search.start_pub_year = 1500
+        # @search.end_pub_year = 2015
       end
 
       it 'should remove whitespace' do
@@ -46,10 +46,11 @@ RSpec.describe Api::V0::SearchQueriesController, type: :controller do
   end
   describe "perform_search" do
 		before :all do
-			@search = Api::V0::SearchQueriesController.new
-      @search.create!(:title => 'New Title',:author => 'New Author',:pub_date => '1500-01-01')
-
-			@words = @search.search_prep()
+			# @search = Api::V0::SearchQueriesController.new
+      # @search= SearchQuery.create!(:title => 'New Title',:author => 'New Author',:pub_date => '1500-01-01')
+      # @search.create(:title => 'New Title',:author => 'New Author',:pub_date => '1500-01-01')
+			@search= SearchQuery.create!(:title => "New title of book", :author => "Name of Author", :pub_year => "2016-02-20")
+      @words = @search.search_prep(:title,:author,:pub_date)
 			@api_key = ENV['DPLA_API_KEY']
 			@url = @search.generate
 			@doc = Nokogiri::XML(open(@url))

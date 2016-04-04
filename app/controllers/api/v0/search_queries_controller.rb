@@ -92,13 +92,13 @@ class Api::V0::SearchQueriesController < ApplicationController
       @new_author.chomp('+')
     end
     api_key_file = open('./DPLA_API_KEY', "rb")
-    begin
+    # begin
       # @api_key = api_key_file.read()
-      @api_key = ENV['DPLA_API_KEY']
-    rescue
-      puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
-      @api_key=nil
-    end
+    @api_key = ENV['DPLA_API_KEY']
+    # rescue
+      # puts "Please create 'DPLA_API_KEY' with copy of DPLA key. See 'http://dp.la/info/developers/codex/policies/#get-a-key'"
+      # @api_key=nil
+    # end
     @start_date = start_pub_year.to_s
     @stop_date = end_pub_year.to_s
   end
