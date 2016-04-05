@@ -15,6 +15,7 @@ class Api::V0::SearchQueriesController < ApplicationController
   # method that displays a particular instance of a search
   def show
     #responds with all the results of a particular search
+    @result_id= search_query.id
     @results= search_query.results
     respond_with @results
   end
