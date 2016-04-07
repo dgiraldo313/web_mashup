@@ -4,28 +4,42 @@ require "json"
 
 class Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
+  skip_before_filter :verify_authenticity_token
   respond_to :xml, :html, :json
-
-
-  # method that collects all search queries in records
-  def index
-    respond_with SearchQuery.all
-  end
-
-  # method that displays a particular instance of a search
-  def show
-    #responds with all the results of a particular search
-    @result_id= search_query.id
-    @results= search_query.results
-    respond_with @results
-  end
 
   def new
     @search = SearchQuery.new
   end
+
   # creates a record of a search_query
   def create
+    if !validate_present_of_fields()
+      flash[:notice] = "Failed to search content. Please check that all the search fields are present"
+      redirect_to root_path
+    else
+      # if all fields are filled in
+      # then we can start the process of building the JSON variable
 
+      get_pub_date_range()
+
+      # start empty JSON variable
+      @result_hash= {}
+      # get the url from DPLA and save to variable
+      get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+
+      @results = JSON.generate(@result_hash)
+
+      render json: @results
+
+    end
+  end
+
+
+  # Methods
+
+  private
+
+  def validate_present_of_fields()
     # gets fields ready to check if they are empty
     @title= getParamValues(:title)
     @author= getParamValues(:author)
@@ -34,66 +48,19 @@ class Api::V0::SearchQueriesController < ApplicationController
     # conditional which checks to see that the user
     # passed in all the fields required
     if (@title.empty? || @author.empty? || @pub_year.empty?)
-      flash[:notice] = "Failed to search content"
-      redirect_to search_path
+      return false
     else
-      # if all fields are filled in
-      # then we can start the process of building the JSON variable
-
-      @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
-      @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
-
-
-      # start empty JSON variable
-      @result_hash= {}
-      # get the url from DPLA and save to variable
-      get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-
-      @results = JSON.generate(@result_hash)
-      @search= SearchQuery.create(search_params.merge(:results => @results))
-      # redirect_to api_v0_search_query_path(@search)
-      if @search.save
-        respond_with :api, :v0, @search
-      end
-    # else
-    #   flash[:notice] = "Failed to search content"
-    #   redirect_to search_path
+      return true
     end
   end
 
-  def search_prep()
-    @new_title = :title.to_s
-    @new_title.gsub(/\s/, '+')
-    while @new_title[-1,1] == '+' do
-       @new_title.chomp('+')
-    end
-    @new_author = :author.to_s
-    @new_author.gsub(/\s/, '+')
-    while @new_author[-1,1] == '+' do
-      @new_author.chomp('+')
-    end
-    api_key_file = open('./DPLA_API_KEY', "rb")
-    @api_key = api_key_file.read()
-    puts :pub_date
+  # Takes the publication date entered by the user and create a range
+  def get_pub_date_range()
+    @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
+    @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
   end
 
-  def generate()
-    search_prep()
-    base_url = 'http://api.dp.la/v2/items?'
-    base_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&api_key=' + @api_key )
-    return base_url
-  end
-  # Methods
-  private
-  # finds a search_query by id
-  def search_query
-    SearchQuery.find(params[:id])
-  end
 
-  # defines the require parameters needed to create a search query
-  def search_params
-    params.require(:search_query).permit(:title, :author, :pub_year)
-  end
 
   def search_prep(title, author, start_pub_year, end_pub_year)
     @new_title = title.to_s
@@ -120,7 +87,9 @@ class Api::V0::SearchQueriesController < ApplicationController
 
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
   def getParamValues(field)
-    return params.require(:search_query).permit(field)[field]
+    if !field.nil?
+      return params.require(:search_query).permit(field)[field]
+    end
   end
 
   ##WYATT
@@ -179,6 +148,5 @@ class Api::V0::SearchQueriesController < ApplicationController
     # request should either return the direct url to the content or nil if nothing found
     #url+="title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
 
-    return url
   end
 end
