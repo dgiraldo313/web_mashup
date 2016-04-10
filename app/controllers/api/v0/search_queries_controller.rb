@@ -5,7 +5,7 @@ class Api::V0::SearchQueriesController < ApplicationController
   skip_before_filter :verify_authenticity_token
   respond_to :xml, :html, :json
 
-<<<<<<< HEAD
+
   # method that collects all search queries in records
   def index
     respond_with SearchQuery.all
@@ -17,21 +17,34 @@ class Api::V0::SearchQueriesController < ApplicationController
     respond_with @search
   end
 
-=======
->>>>>>> master
   def new
     @search = SearchQuery.new
   end
 
   # creates a record of a search_query
   def create
-<<<<<<< HEAD
+
+    if !validate_present_of_fields()
+      flash[:notice] = "Failed to search content. Please check that all the search fields are present"
+      redirect_to root_path
+    else
+      # if all fields are filled in
+      # then we can start the process of building the JSON variable
+      get_pub_date_range()
+      # start empty JSON variable
+      @result_hash= {}
+      # get the url from DPLA and save to variable
+      get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
+      @results = JSON.generate(@result_hash)
+      render json: @results
+    end
+  end
+
     # save parameters from form onto variables
     @title= getParamValues(:title)
     @author= getParamValues(:author)
     @start_pub_year= getParamValues(:start_pub_year)
     @end_pub_year= getParamValues(:end_pub_year)
-
     # get the url from DPLA and save to variable
     @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
     @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL))
@@ -42,33 +55,8 @@ class Api::V0::SearchQueriesController < ApplicationController
       flash[:notice] = "Failed to search content"
       redirect_to search_path
     end
-  end
+end
 
-
-=======
-    if !validate_present_of_fields()
-      flash[:notice] = "Failed to search content. Please check that all the search fields are present"
-      redirect_to root_path
-    else
-      # if all fields are filled in
-      # then we can start the process of building the JSON variable
-
-      get_pub_date_range()
-
-      # start empty JSON variable
-      @result_hash= {}
-      # get the url from DPLA and save to variable
-      get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-
-      @results = JSON.generate(@result_hash)
-
-      render json: @results
-
-    end
-  end
-
-
->>>>>>> master
   # Methods
 
   private
@@ -78,7 +66,6 @@ class Api::V0::SearchQueriesController < ApplicationController
     @title= getParamValues(:title)
     @author= getParamValues(:author)
     @pub_year= getParamValues(:pub_year)
-
     # conditional which checks to see that the user
     # passed in all the fields required
     if (@title.empty? || @author.empty? || @pub_year.empty?)
@@ -88,19 +75,15 @@ class Api::V0::SearchQueriesController < ApplicationController
     end
   end
 
-<<<<<<< HEAD
-  # defines the require parameters needed to create a search query
-  def search_params
-    params.require(:search_query).permit(:title, :author, :start_pub_year, :end_pub_year)
-=======
   # Takes the publication date entered by the user and create a range
   def get_pub_date_range()
     @start_pub_year= ((getParamValues(:pub_year).to_i)-100).to_s
     @end_pub_year= ((getParamValues(:pub_year).to_i)+100).to_s
->>>>>>> master
+
+  # defines the require parameters needed to create a search query
+  def search_params
+    params.require(:search_query).permit(:title, :author, :start_pub_year, :end_pub_year)
   end
-
-
 
   def search_prep(title, author, start_pub_year, end_pub_year)
     @new_title = title.to_s
@@ -181,7 +164,6 @@ class Api::V0::SearchQueriesController < ApplicationController
          url = nil
        end
      end
-   end
 
     #build url to send request to api (Ex. api.dpla.com/?title....)
     # figure out how to make GET request with ruby
@@ -202,7 +184,7 @@ end
 
 def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
   search_prep(title, author, start_pub_year, end_pub_year)
-  base_url = 'https://babel.hathitrust.org/'
+  base_url = 'https://www.hathitrust.org/data_api'
   search_url = '/v2/items?'
   search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key )
   final_url = base_url + search_url
@@ -241,6 +223,5 @@ def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
         url = nil
       end
     end
-  end
   return url
 end
