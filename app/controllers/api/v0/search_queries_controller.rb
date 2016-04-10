@@ -113,7 +113,7 @@ class Api::V0::SearchQueriesController < ApplicationController
       return params.require(:search_query).permit(field)[field]
     end
   end
-
+ #changes
   ##WYATT
   # This is the function that will create the get request to
   # retrieve the url through the DPLA API.
