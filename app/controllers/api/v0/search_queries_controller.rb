@@ -1,4 +1,6 @@
 require "net/http"
+require "uri"
+require "json"
 
 class Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
@@ -224,4 +226,6 @@ def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
       end
     end
   return url
+end
+end
 end
