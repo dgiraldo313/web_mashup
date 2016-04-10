@@ -8,13 +8,17 @@
 </head>
 <body>
   <div class="flash">
-  		  <%flash.each do|type,message| -%>
-  		<div class= "alert flash <%= type %>"><%= message %></div>
-  		  <%end %>
-  	</div>
+        <%flash.each do|type,message| -%>
+      <div class= "alert alert-<%= type %>"><%= message %></div>
+        <%end %>
+  </div>
+  <div class="container">
+
+    <div class="jumbotron">
+      <%= yield %>
+    </div>
   </div>
 
-<%= yield %>
 
 </body>
 </html>
