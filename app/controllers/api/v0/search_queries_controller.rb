@@ -150,7 +150,7 @@ end
 
 def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
   search_prep(title, author, start_pub_year, end_pub_year)
-  base_url = 'https://www.hathitrust.org/data_api'
+  base_url = 'https://babel.hathitrust.org/'
   search_url = '/v2/items?'
   search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key )
   final_url = base_url + search_url
@@ -191,5 +191,4 @@ def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
     end
   end
   return url
-end
 end
