@@ -1,6 +1,4 @@
 require "net/http"
-require "uri"
-require "json"
 
 class Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
@@ -57,7 +55,11 @@ class Api::V0::SearchQueriesController < ApplicationController
       flash[:notice] = "Failed to search content"
       redirect_to search_path
     end
+<<<<<<< HEAD
 end
+=======
+
+>>>>>>> master
 
   # Methods
 
@@ -227,5 +229,8 @@ def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
     end
   return url
 end
+<<<<<<< HEAD
 end
 end
+=======
+>>>>>>> master
