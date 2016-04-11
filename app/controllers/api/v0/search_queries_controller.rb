@@ -5,7 +5,6 @@ class Api::V0::SearchQueriesController < ApplicationController
   skip_before_filter :verify_authenticity_token
   respond_to :xml, :html, :json
 
-
   # method that collects all search queries in records
   def index
     respond_with SearchQuery.all
@@ -45,6 +44,10 @@ class Api::V0::SearchQueriesController < ApplicationController
     @author= getParamValues(:author)
     @start_pub_year= getParamValues(:start_pub_year)
     @end_pub_year= getParamValues(:end_pub_year)
+<<<<<<< HEAD
+=======
+
+>>>>>>> Jega_Working
     # get the url from DPLA and save to variable
     @DPLA_URL = get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
     @search= SearchQuery.create(search_params.merge(:DPLA_URL => @DPLA_URL))
@@ -164,6 +167,10 @@ class Api::V0::SearchQueriesController < ApplicationController
          url = nil
        end
      end
+<<<<<<< HEAD
+=======
+   end
+>>>>>>> Jega_Working
 
     #build url to send request to api (Ex. api.dpla.com/?title....)
     # figure out how to make GET request with ruby
@@ -223,5 +230,12 @@ def get_HathiTrust_url(title, author, start_pub_year, end_pub_year)
         url = nil
       end
     end
+<<<<<<< HEAD
   return url
 end
+=======
+  end
+  return url
+end
+end
+>>>>>>> Jega_Working
