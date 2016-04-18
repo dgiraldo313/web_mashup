@@ -113,10 +113,8 @@ GEM
     minitest (5.8.4)
     multi_json (1.11.2)
     multi_test (0.1.2)
-    mysql2 (0.4.2)
     nokogiri (1.6.7.2)
       mini_portile2 (~> 2.0.0.rc2)
-    pg (0.18.4)
     puma (2.16.0)
     rack (1.6.4)
     rack-cors (0.4.0)
@@ -226,9 +224,7 @@ DEPENDENCIES
   jquery-rails
   json
   launchy
-  mysql2 (~> 0.4.2)
   nokogiri
-  pg
   puma
   rack-cors
   rails (= 4.2.5.1)

@@ -1,0 +1,7 @@
+<% @res= JSON.parse(@results) %>
+<% @result_count= @res["DPLA"]["count"] %>
+
+<h1> We got <%= @result_count %> results </h1>
+ <p style="text-align:center"> View results in JSON formatted file</p>
+ <p style="text-align:center; font-size:.8em"> (JSON document only display first 10 results)</p>
+ <a href= "/api/v0/search_queries/<%= @result_id %>.json" class="btn btn-primary box-center">GO</a>

@@ -4,7 +4,7 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.5.1'
 # Use mysql2 as the database for Active Record
-gem 'mysql2', '~> 0.4.2'
+# gem 'mysql2', '~> 0.4.2'
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 5.0'
 # Use Uglifier as compressor for JavaScript assets
@@ -56,7 +56,7 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.0'
 
 #RSpec for unit testing
-  gem 'cucumber-rails'
+  gem 'cucumber-rails', :require => 'false'
   gem 'cucumber-rails-training-wheels' # some pre-fabbed step definitions
   gem 'database_cleaner' # to clear Cucumber's test database between runs
   gem 'capybara'         # lets Cucumber pretend to be a web browser
@@ -78,5 +78,5 @@ group :test do
 end
 
 group :production do
-  gem 'pg'
+  # gem 'pg'
 end
