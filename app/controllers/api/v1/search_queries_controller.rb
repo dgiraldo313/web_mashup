@@ -1,8 +1,6 @@
 require "net/http"
 require "uri"
 require "json"
-require 'open-uri'
-require 'nokogiri'
 
 class Api::V1::SearchQueriesController < ApplicationController
   # returns both html and xml content
@@ -28,7 +26,6 @@ class Api::V1::SearchQueriesController < ApplicationController
       @result_hash= {}
       # get the url from DPLA and save to variable
       get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
-      get_gutenberg_url(@title, @author, @start_pub_year, @end_pub_year)
 
       @results = JSON.generate(@result_hash)
 
@@ -86,14 +83,6 @@ class Api::V1::SearchQueriesController < ApplicationController
     end
     @start_date = start_pub_year.to_s
     @stop_date = end_pub_year.to_s
-  end
-
-  def gutenberg_search_prep(title, author, start_pub_year, end_pub_year)
-    @guten_title = title.to_s
-    @guten_title = @guten_title.gsub(/[\s]/, '+')
-    while @guten_title[-1,1] == '+' do
-       @guten_title.chomp('+')
-    end
   end
 
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
@@ -160,60 +149,4 @@ class Api::V1::SearchQueriesController < ApplicationController
     #url+="title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
 
   end
-  def get_gutenberg_url(title, author, start_pub_year, end_pub_year)
-    gutenberg_search_prep(title, author, start_pub_year, end_pub_year)
-    base_url = 'https://www.gutenberg.org/ebooks/search/?query='
-    search_url = (@guten_title)
-    final_url = base_url + search_url
-    html = open(final_url)
-    response = Nokogiri::HTML(html)
-    showings = []
-    count = 0
-    
-    response.css('.booklink').each do |booklink|
-      count = count + 1
-      link = booklink.css('a.link').map { |link| link['href'] }
-      gberg_final_link = ('https://www.gutenberg.org' + link[0])
-      gberg_title = booklink.css('.title').map { |title| title.text.strip }
-      gberg_subtitle = booklink.css('.subtitle').map { |title| title.text.strip }
-    showings.push(
-    link: gberg_final_link,
-    title: gberg_title[0],
-    subtitle: gberg_subtitle[0]
-    )
-    end
-
-    final_count = count
-    gberg_hash = JSON.pretty_generate(showings)
-
-    data_hash = JSON.parse(gberg_hash)
-
-
-    gutenberg_hash= @result_hash[:Project_Gutenberg]= {:count=>final_count}
-    if count> 10
-      count = 10
-    end
-    if count > 0
-      for i in 0..(count-1)
-        begin
-          title =  data_hash[i]["title"]
-          creator = data_hash[i]["subtitle"]
-          pub_date = "not_available"
-          provider = "not_available"
-          publisher = "not_available"
-          url = data_hash[i]["link"]
-          begin
-            city = "not_available"
-            country = "not_available"
-            location = "not_available"
-            gutenberg_hash[i]= {:title=>title, :author => creator, :url => url}
-          rescue Exception => e
-            gutenberg_hash[i]= {:title=>title, :author => creator, :url => url}
-          end
-        rescue
-          url = nil
-        end
-      end
-    end
-  end # end of guten method
 end
