@@ -173,7 +173,9 @@ class Api::V0::SearchQueriesController < ApplicationController
     hathi_search_url = "@new_title"
     base_url_b = ";a=srchls"
     hathi_final_url = base_url_a + hathi_search_url + base_url_b
-    page = Nokogiri::HTML(open(URI::encode(hathi_final_url)))
+    final_url_uri = URI.parse(hathi_final_url)
+    response = Net::HTTP.get(final_url_uri)
+    page = Nokogiri::HTML(response)#(open(URI::encode(hathi_final_url)))
     # data = {result: []}
     data = []
     count = 0
@@ -198,7 +200,7 @@ class Api::V0::SearchQueriesController < ApplicationController
     		if x.css('div.result-access-link').css('ul').length > 0
     			url = x.css('div.result-access-link').css('ul').css('li').css('a')[0]['href']
     		end
-        
+
     	end
 
       data.push(
