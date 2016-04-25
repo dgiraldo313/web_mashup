@@ -1,7 +1,6 @@
 require "net/http"
 require "uri"
 require "json"
-require 'open-uri'
 require 'nokogiri'
 
 class Api::V1::SearchQueriesController < ApplicationController
@@ -164,7 +163,8 @@ class Api::V1::SearchQueriesController < ApplicationController
     base_url = 'https://www.gutenberg.org/ebooks/search/?query='
     search_url = (@guten_title)
     final_url = base_url + search_url
-    html = open(final_url, "User-Agent" => "Ruby/#{RUBY_VERSION}")
+    final_url_uri= URI.parse(final_url)
+    html =  Net::HTTP.get(final_url_uri)
     response = Nokogiri::HTML(html)
     showings = []
     count = 0
