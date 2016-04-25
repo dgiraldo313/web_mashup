@@ -96,8 +96,7 @@ class Api::V0::SearchQueriesController < ApplicationController
   # This is the function that will create the get request to
   # retrieve the url through the DPLA API.
   # Basically we need to make a GET request to the API.
-  # We can put together the url by using the parameters passed in to the function( author, title, etc..)
-  # this function should return a string with the url to the microfiche or null if nothing found.
+  # this function should add content to the result hash.
   def get_DPLA_url(title, author, start_pub_year, end_pub_year)
     search_prep(title, author, start_pub_year, end_pub_year)
     base_url = 'http://api.dp.la'
@@ -140,17 +139,5 @@ class Api::V0::SearchQueriesController < ApplicationController
         end
       end
     end
-
-    #build url to send request to api (Ex. api.dpla.com/?title....)
-    # figure out how to make GET request with ruby
-      #http://docs.ruby-lang.org/en/2.0.0/Net/HTTP.html this looks like a good resoruce to figure out get requests on ruby
-    #request should be made here
-    # request should either return the direct url to the content or nil if nothing found
-    #url+="title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
-
   end
-<<<<<<< HEAD
-=======
-
->>>>>>> vishnu
 end
