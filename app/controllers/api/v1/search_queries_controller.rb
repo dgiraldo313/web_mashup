@@ -164,7 +164,7 @@ class Api::V1::SearchQueriesController < ApplicationController
     base_url = 'https://www.gutenberg.org/ebooks/search/?query='
     search_url = (@guten_title)
     final_url = base_url + search_url
-    html = open(final_url, 'User-Agent' => 'ruby')
+    html = open(final_url, "User-Agent" => "Ruby/#{RUBY_VERSION}")
     response = Nokogiri::HTML(html)
     showings = []
     count = 0
