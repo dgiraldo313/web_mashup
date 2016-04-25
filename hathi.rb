@@ -5,9 +5,9 @@ require 'json'
 require 'pry'
 
 # query = 'qwerty'
-# link = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1=#{query};a=srchls;lmt=ft;sz=100"
+# link = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1=#{query};a=srchls"
 base_url_a = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1="
-hathi_search_url = "pilgrims"
+hathi_search_url = "atla"
 base_url_b = ";a=srchls"
 hathi_final_url = base_url_a + hathi_search_url + base_url_b
 

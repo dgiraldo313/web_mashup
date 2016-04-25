@@ -198,7 +198,7 @@ class Api::V0::SearchQueriesController < ApplicationController
     		if x.css('div.result-access-link').css('ul').length > 0
     			url = x.css('div.result-access-link').css('ul').css('li').css('a')[0]['href']
     		end
-
+        
     	end
 
       data.push(
