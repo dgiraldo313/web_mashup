@@ -4,10 +4,14 @@ require 'nokogiri'
 require 'json'
 require 'pry'
 
-query = 'qwerty'
-link = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1=#{query};a=srchls;lmt=ft;sz=100"
+# query = 'qwerty'
+# link = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1=#{query};a=srchls;lmt=ft;sz=100"
+base_url_a = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1="
+hathi_search_url = "pilgrims"
+base_url_b = ";a=srchls"
+hathi_final_url = base_url_a + hathi_search_url + base_url_b
 
-page = Nokogiri::HTML(open(URI::encode(link)))
+page = Nokogiri::HTML(open(URI::encode(hathi_final_url)))
 # Hash Format
 	# {
 	# 	title:

@@ -3,6 +3,7 @@ require "uri"
 require "json"
 require 'open-uri'
 require 'nokogiri'
+require 'pry'
 
 
 class Api::V1::SearchQueriesController < ApplicationController
@@ -89,6 +90,14 @@ class Api::V1::SearchQueriesController < ApplicationController
     @stop_date = end_pub_year.to_s
   end
 
+  def hathi_search_prep(title, author, start_pub_year, end_pub_year)
+    @hathi_title = title.to_s
+    @hathi_title = @hathi_title.gsub(/[\s]/, '%20')
+    while @hathi_title[-1,1] == '%20' do
+       @hathi_title.chomp('%20')
+    end
+  end
+
   # defines method to retrive the param values so that they can be passed to the get_DPLA_url method
   def getParamValues(field)
     if !field.nil?
@@ -162,13 +171,16 @@ class Api::V1::SearchQueriesController < ApplicationController
     search_prep(title, author, start_pub_year, end_pub_year)
     base_url_a = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1="
     hathi_search_url = "@new_title"
-    base_url_b = "a=srchls;lmt=ft;sz=100"
+    base_url_b = ";a=srchls"
     hathi_final_url = base_url_a + hathi_search_url + base_url_b
     page = Nokogiri::HTML(open(URI::encode(hathi_final_url)))
-    data = {result: []}
+    # data = {result: []}
+    data = []
+    count = 0
 
     page.css("div[class = 'row result alt']").each do |x|
-    	title, author, pub_date, url = ''
+      count = count + 1
+      title, author, pub_date, url = ''
 
     	y = x.css('h4')
         title = y.children[1..2].text if y.length > 0
@@ -186,15 +198,25 @@ class Api::V1::SearchQueriesController < ApplicationController
     		if x.css('div.result-access-link').css('ul').length > 0
     			url = x.css('div.result-access-link').css('ul').css('li').css('a')[0]['href']
     		end
+
     	end
 
-    	data[:result] << {
-    				title: title,
-    				author: author,
-    				pub_date: pub_date,
-    				url: url
-    			}
+      data.push(
+        title: title,
+        author: author,
+        pub_date: pub_date,
+        url: url
+      )
+
+    	# data[:result] << {
+    	# 			title: title,
+    	# 			author: author,
+    	# 			pub_date: pub_date,
+    	# 			url: url
+    	# 		}
     end
+
+    final_count = count
     hathi_data = JSON.pretty_generate(data)
     data_hash = JSON.parse(hathi_data)
     # File.open("result#{Time.now.to_i}.json","w") do |f|
@@ -205,9 +227,9 @@ class Api::V1::SearchQueriesController < ApplicationController
     # data_hash = JSON.parse(json_data)
 
     #add HathiTrust content to hash
-    count = data_hash["count"]
-    hathi_hash= @result_hash[:HathiTrust]= {:count=>count}
-    if count> 10
+    hathi_hash= @result_hash[:HathiTrust]= {:count=>final_count}
+
+    if count > 10
       count = 10
     end
     if count > 0
