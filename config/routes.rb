@@ -8,8 +8,14 @@ Rails.application.routes.draw do
 
   # get "search", to: "api/v0/search_queries#new"
   # get "search/:id", to: "api/v0/search_queries#show"
+<<<<<<< HEAD
   root to: 'api/v0/search_queries#new'
   get 'search', to: 'api/v0/search_queries#create'
+=======
+  root to: 'api/v1/search_queries#new'
+  get '/v1', to: 'api/v1/search_queries#new'
+  get 'search', to: 'api/v1/search_queries#create'
+>>>>>>> vishnu
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

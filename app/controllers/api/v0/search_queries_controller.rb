@@ -149,4 +149,8 @@ class Api::V0::SearchQueriesController < ApplicationController
     #url+="title="+title+",author="+author+",start_pub_year"+start_pub_year+",end_pub_year="+end_pub_year
 
   end
+<<<<<<< HEAD
+=======
+
+>>>>>>> vishnu
 end
