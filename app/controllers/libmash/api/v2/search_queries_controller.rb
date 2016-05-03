@@ -240,12 +240,14 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
     hathi_search_url = "@new_title"
     base_url_b = ";a=srchls"
     hathi_final_url = base_url_a + hathi_search_url + base_url_b
-    final_url_uri = URI.parse(hathi_final_url)
-    response = Net::HTTP.get(final_url_uri)
-    page = Nokogiri::HTML(response)#(open(URI::encode(hathi_final_url)))
+    response_num = check_response(hathi_final_url)
+    if response_num.eql? '200'
+      final_url_uri = URI.parse(hathi_final_url)
+      response = Net::HTTP.get(final_url_uri)
+      page = Nokogiri::HTML(response)#(open(URI::encode(hathi_final_url)))
     # data = {result: []}
-    data = []
-    count = 0
+      data = []
+      count = 0
 
     page.css("div[class = 'row result alt']").each do |x|
       count = count + 1
@@ -323,5 +325,8 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
         end
       end
     end
+  else
+    hathi_hash= @result_hash[:HathiTrust]={:count=>"Error: "+response_num}
   end
+end
 end
