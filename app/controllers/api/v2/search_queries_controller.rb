@@ -122,7 +122,7 @@ class Api::V2::SearchQueriesController < ApplicationController
     search_url += ('sourceResource.title=' + @new_title + '&sourceResource.creator=' + @new_author + '&sourceResource.date.after=' + @start_date + '&sourceResource.date.before=' + @stop_date + '&api_key=' + @api_key )
     final_url = base_url + search_url
     response_num = check_response(final_url)
-    if response_num == '200'
+    if response_num.eql? '200'
       final_url_uri = URI.parse(final_url)
       response = Net::HTTP.get_response(final_url_uri)
       response_body = response.body
@@ -178,7 +178,7 @@ class Api::V2::SearchQueriesController < ApplicationController
     search_url = (@guten_title)
     final_url = base_url + search_url
     final_url_uri= URI.parse(final_url)
-    html =  Net::HTTP.get(final_url_uri)
+    html =  Net::HTTP.get_response(final_url_uri)
     response = Nokogiri::HTML(html)
     showings = []
     count = 0
