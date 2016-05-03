@@ -18,9 +18,9 @@ Rails.application.routes.draw do
 
   # get "search", to: "/api/v0/search_queries#new"
   # get "search/:id", to: "api/v0/search_queries#show"
-
+  # root to: 'libmash/api/v2/search_queries#new'
   get '/libmash', to: 'libmash/api/v2/search_queries#new'
-  #root to: '/libmash'
+
   get 'search', to: 'libmash/api/v2/search_queries#create'
 
   # The priority is based upon order of creation: first created -> highest priority.

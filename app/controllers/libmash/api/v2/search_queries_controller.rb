@@ -17,7 +17,7 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
   def create
     if !validate_present_of_fields()
       flash[:notice] = "Failed to search content. Please check that all the search fields are present"
-      redirect_to root_path
+      redirect_to '/libmash'
     else
       # if all fields are filled in
       # then we can start the process of building the JSON variable
