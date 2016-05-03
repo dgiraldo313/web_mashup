@@ -1,25 +1,27 @@
 Rails.application.routes.draw do
-  namespace :api do
-    namespace :v0 do
-      resources :search_queries
+  namespace 'libmash' do
+    namespace :api do
+      namespace :v0 do
+        resources :search_queries
 
-    end
-    namespace :v1 do
-      resources :search_queries
+      end
+      namespace :v1 do
+        resources :search_queries
 
-    end
-    namespace :v2 do
-      resources :search_queries
+      end
+      namespace :v2 do
+        resources :search_queries
 
+      end
     end
   end
 
   # get "search", to: "/api/v0/search_queries#new"
   # get "search/:id", to: "api/v0/search_queries#show"
 
-  get '/libmash', to: 'api/v2/search_queries#new'
+  get '/libmash', to: 'libmash/api/v2/search_queries#new'
   #root to: '/libmash'
-  get 'search', to: 'api/v2/search_queries#create'
+  get 'search', to: 'libmash/api/v2/search_queries#create'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

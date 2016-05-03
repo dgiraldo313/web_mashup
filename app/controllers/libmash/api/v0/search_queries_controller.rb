@@ -2,7 +2,7 @@ require "net/http"
 require "uri"
 require "json"
 
-class Api::V0::SearchQueriesController < ApplicationController
+class Libmash::Api::V0::SearchQueriesController < ApplicationController
   # returns both html and xml content
   skip_before_filter :verify_authenticity_token
   respond_to :xml, :html, :json

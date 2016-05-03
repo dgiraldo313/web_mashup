@@ -1,7 +1,7 @@
 <div class="row">
 
         <h1>Search Resources</h1>
-        <%= form_for @search, url: api_v2_search_queries_path	 do |f| %>
+        <%= form_for @search, url: libmash_api_v2_search_queries_path	 do |f| %>
           <section class="col-md-4">
             <!-- <i class="glyphicon glyphicon-pencil"></i> -->
             <%= f.text_field :title, placeholder: 'Title', class: "input form-control" %>

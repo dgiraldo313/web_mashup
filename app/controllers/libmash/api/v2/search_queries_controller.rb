@@ -2,8 +2,9 @@ require "net/http"
 require "uri"
 require "json"
 require 'nokogiri'
+require 'pry'
 
-class Api::V1::SearchQueriesController < ApplicationController
+class Libmash::Api::V2::SearchQueriesController < ApplicationController
   # returns both html and xml content
   skip_before_filter :verify_authenticity_token
   respond_to :xml, :html, :json
@@ -28,6 +29,8 @@ class Api::V1::SearchQueriesController < ApplicationController
       # get the url from DPLA and save to variable
       get_DPLA_url(@title, @author, @start_pub_year, @end_pub_year)
       get_gutenberg_url(@title, @author, @start_pub_year, @end_pub_year)
+      # get the url from HathiTrust and save to variable
+      get_hathitrust_url(@title, @author, @start_pub_year, @end_pub_year)
 
       @results = JSON.generate(@result_hash)
 
@@ -215,4 +218,99 @@ class Api::V1::SearchQueriesController < ApplicationController
       end
     end
   end # end of guten method
+  #Jega
+  # This is the function that will create the get request to
+  # Scrape Screen the url through the HathiTrust html view source.
+  # We can put together the url by using the parameters passed in to the function( author, title, etc..)
+  # this function should return a string with the url to the microfiche or null if nothing found.
+  def get_hathitrust_url(title, author, start_pub_year, end_pub_year)
+    search_prep(title, author, start_pub_year, end_pub_year)
+    base_url_a = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1="
+    hathi_search_url = "@new_title"
+    base_url_b = ";a=srchls"
+    hathi_final_url = base_url_a + hathi_search_url + base_url_b
+    final_url_uri = URI.parse(hathi_final_url)
+    response = Net::HTTP.get(final_url_uri)
+    page = Nokogiri::HTML(response)#(open(URI::encode(hathi_final_url)))
+    # data = {result: []}
+    data = []
+    count = 0
+
+    page.css("div[class = 'row result alt']").each do |x|
+      count = count + 1
+      title, author, pub_date, url = ''
+
+    	y = x.css('h4')
+        title = y.children[1..2].text if y.length > 0
+      # if x.css('div.result-metadata-title').length > 0
+      #   author = x.css('div.result-metadata-title').css('span.Title').text
+      # end
+    	if x.css('div.result-metadata-author').length > 0
+    		author = x.css('div.result-metadata-author').css('span.Author').text
+    	end
+    	if x.css("div.result-metadata-published").length > 0
+    		pub_date = x.css("div.result-metadata-published").text.gsub(/[^0-9]/, '')
+    	end
+
+    	if x.css('div.result-access-link').length > 0
+    		if x.css('div.result-access-link').css('ul').length > 0
+    			url = x.css('div.result-access-link').css('ul').css('li').css('a')[0]['href']
+    		end
+
+    	end
+
+      data.push(
+        title: title,
+        author: author,
+        pub_date: pub_date,
+        url: url
+      )
+
+    	# data[:result] << {
+    	# 			title: title,
+    	# 			author: author,
+    	# 			pub_date: pub_date,
+    	# 			url: url
+    	# 		}
+    end
+
+    final_count = count
+    hathi_data = JSON.pretty_generate(data)
+    data_hash = JSON.parse(hathi_data)
+    # File.open("result#{Time.now.to_i}.json","w") do |f|
+    #   f.write(data.to_json)
+    # end
+    #json_data = Net::HTTP.get(URI.parse(search_url))
+    #file = file.read(json_data)
+    # data_hash = JSON.parse(json_data)
+
+    #add HathiTrust content to hash
+    hathi_hash= @result_hash[:HathiTrust]= {:count=>final_count}
+
+    if count > 10
+      count = 10
+    end
+    if count > 0
+      for i in 0..(count-1)
+        begin
+          title = data_hash[i]["title"]
+          creator = data_hash[i]["author"]
+          pub_date = data_hash[i]["pub_date"]
+          provider =
+          publisher =
+          url = data_hash[i]["url"]
+          begin
+            city =
+            country =
+            location =
+            hathi_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :url => url}
+          rescue Exception => e
+            hathi_hash[i]= {:title=>title, :author => creator, :pub_date=> pub_date, :url => url}
+          end
+        rescue
+          url = nil
+        end
+      end
+    end
+  end
 end
