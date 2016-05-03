@@ -178,7 +178,7 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
     search_url = (@guten_title)
     final_url = base_url + search_url
     final_url_uri= URI.parse(final_url)
-    html =  Net::HTTP.get_response(final_url_uri)
+    html =  Net::HTTP.get(final_url_uri)
     response = Nokogiri::HTML(html)
     showings = []
     count = 0
