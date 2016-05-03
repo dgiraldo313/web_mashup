@@ -21,7 +21,7 @@ Rails.application.routes.draw do
   # root to: 'libmash/api/v2/search_queries#new'
   get '/libmash', to: 'libmash/api/v2/search_queries#new'
 
-  get 'search', to: 'libmash/api/v2/search_queries#create'
+  get '/libmash/search', to: 'libmash/api/v2/search_queries#create'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
