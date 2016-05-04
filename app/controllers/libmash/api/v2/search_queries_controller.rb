@@ -239,7 +239,6 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
     search_prep(title, author, start_pub_year, end_pub_year)
   # Defining the page url for the Hathi Trust
     base_url_a = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1="
-    hathi_search_url = "@new_title"
     hathi_search_url = (@new_title)
     base_url_b = ";a=srchls"
     hathi_final_url = base_url_a + hathi_search_url + base_url_b
