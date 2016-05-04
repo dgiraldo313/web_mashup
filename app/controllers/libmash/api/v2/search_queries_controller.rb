@@ -1,3 +1,4 @@
+# Importing the necessary plugins
 require "net/http"
 require "uri"
 require "json"
@@ -236,35 +237,39 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
   # this function should return a string with the url to the microfiche or null if nothing found.
   def get_hathitrust_url(title, author, start_pub_year, end_pub_year)
     search_prep(title, author, start_pub_year, end_pub_year)
+  # Defining the page url for the Hathi Trust
     base_url_a = "https://babel.hathitrust.org/cgi/ls?field1=ocr;q1="
     hathi_search_url = "@new_title"
+    hathi_search_url = (@new_title)
     base_url_b = ";a=srchls"
     hathi_final_url = base_url_a + hathi_search_url + base_url_b
     response_num = check_response(hathi_final_url)
     if response_num.eql? '200'
       final_url_uri = URI.parse(hathi_final_url)
       response = Net::HTTP.get(final_url_uri)
+    # Fetching page from the Hathi Trust and parsing it
       page = Nokogiri::HTML(response)#(open(URI::encode(hathi_final_url)))
     # data = {result: []}
       data = []
       count = 0
 
+    # Getting each search result from the parsed HTML
     page.css("div[class = 'row result alt']").each do |x|
       count = count + 1
       title, author, pub_date, url = ''
 
+    # Determining Title of the Resource
     	y = x.css('h4')
         title = y.children[1..2].text if y.length > 0
-      # if x.css('div.result-metadata-title').length > 0
-      #   author = x.css('div.result-metadata-title').css('span.Title').text
-      # end
+    # Determining Author of the Resource
     	if x.css('div.result-metadata-author').length > 0
     		author = x.css('div.result-metadata-author').css('span.Author').text
     	end
+    # Determining Published Date of the Resource
     	if x.css("div.result-metadata-published").length > 0
     		pub_date = x.css("div.result-metadata-published").text.gsub(/[^0-9]/, '')
     	end
-
+    # Determining Hathi Trust URL of the Resource
     	if x.css('div.result-access-link').length > 0
     		if x.css('div.result-access-link').css('ul').length > 0
     			url = x.css('div.result-access-link').css('ul').css('li').css('a')[0]['href']
@@ -279,14 +284,11 @@ class Libmash::Api::V2::SearchQueriesController < ApplicationController
         url: url
       )
 
-    	# data[:result] << {
-    	# 			title: title,
-    	# 			author: author,
-    	# 			pub_date: pub_date,
-    	# 			url: url
-    	# 		}
+
     end
 
+    # Generating a unique json file with hash results
+    # Information are within the `result` key in the json file
     final_count = count
     hathi_data = JSON.pretty_generate(data)
     data_hash = JSON.parse(hathi_data)
