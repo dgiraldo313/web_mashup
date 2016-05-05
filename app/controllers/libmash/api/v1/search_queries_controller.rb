@@ -162,7 +162,8 @@ class Libmash::Api::V1::SearchQueriesController < ApplicationController
     gutenberg_search_prep(title, author, start_pub_year, end_pub_year)
     base_url = 'https://www.gutenberg.org/ebooks/search/?query='
     search_url = (@guten_title)
-    final_url = base_url + search_url
+    suffix_url = '&go=Go'
+    final_url = base_url + search_url + suffix_url
     final_url_uri= URI.parse(final_url)
     html =  Net::HTTP.get(final_url_uri)
     response = Nokogiri::HTML(html)
